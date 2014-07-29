@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">AR_Drone</string>
+    <string name="hello_world">Update Files</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_flight_mode">FlightMode</string>
+
+</resources>
