@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/rseljeii/Desktop/Libs/javadrone-aace51cb3521/lib/SteelSeries/SteelSeries-3.9.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/rseljeii/Desktop/Libs/javadrone-aace51cb3521/lib/SteelSeries/trident-6.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/rseljeii/Desktop/Libs/javadrone-aace51cb3521/lib/hidapi.jar"/>
+	<classpathentry kind="lib" path="C:/Users/rseljeii/Desktop/Libs/javadrone-aace51cb3521/lib/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="C:/Users/rseljeii/Desktop/Libs/javadrone-aace51cb3521/lib/CopyLibs/org-netbeans-modules-java-j2seproject-copylibstask.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
