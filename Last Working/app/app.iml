@@ -61,6 +61,11 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 20 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="hidapi" level="project" />
+    <orderEntry type="library" exported="" name="trident-6.2" level="project" />
+    <orderEntry type="library" exported="" name="org-netbeans-modules-java-j2seproject-copylibstask" level="project" />
+    <orderEntry type="library" exported="" name="SteelSeries-3.9.2" level="project" />
+    <orderEntry type="library" exported="" name="log4j-1.2.16" level="project" />
   </component>
 </module>
 
