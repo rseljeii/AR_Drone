@@ -3,25 +3,30 @@ package com.example.rseljeii.ar_drone;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.shigeodayo.ardrone.command.CommandManager;
-import com.shigeodayo.ardrone.navdata.NavDataManager;
+import com.codeminders.ardrone.CommandSender;
 
 /**
  * Created by rseljeii on 7/29/2014.
  */
-public class AsyncTaskCommand extends AsyncTask<CommandManager, Void, String>
+public class AsyncTaskCommand extends AsyncTask<CommandSender, Void, String>
 {
-    @Override
-    protected String doInBackground(CommandManager... params) {
-        Log.i("CommandManager", "DOING SOMETHING");
+    //AsyncCommandSender ACS = new AsyncCommandSender();
 
-        for (int i = 0; i < 5; i++) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.interrupted();
-            }
+    @Override
+    protected String doInBackground(CommandSender... params)
+    {
+        Log.i("AsyncTaskCommand", "DOING SOMETHING");
+
+        params[0].run();
+
+        // test if previous command does not perform turns
+        /*
+        for(int i = 0; i < params.length; i++)
+        {
+            params[i].run();
         }
+        */
+
         return "Executed";
     }
 
@@ -30,7 +35,7 @@ public class AsyncTaskCommand extends AsyncTask<CommandManager, Void, String>
         //TextView txt = (TextView) findViewById(R.id.output);
         //txt.setText("Executed"); // txt.setText(result);
 
-        Log.i("AsyncTask", "Executed");
+        Log.i("AsyncTaskCommand", "Executed");
     }
 
     @Override

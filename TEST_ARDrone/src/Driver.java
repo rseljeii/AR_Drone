@@ -25,7 +25,7 @@ public class Driver
         	System.out.println("Constructor");
         	drone = new ARDrone(); 	
         	System.out.println("Connect");
-        	drone.connect();	
+        	//drone.connect();	
             //drone.clearEmergencySignal();
 
             // Wait until drone is ready
@@ -41,31 +41,31 @@ public class Driver
             drone.takeOff();
 
             // Fly a little :)
-            Thread.sleep(10000);
+            //Thread.sleep(10000);
             
             //Move Forward
             
             System.out.println("Forward");
-            for(int i = 0; i < 100000; i++)
+            //for(int i = 0; i < 100000; i++)
             drone.move(0, -0.9f, 0, 0);
             Thread.sleep(3000);
             
 			//Turn Left
             System.out.println("Left");
-            for(int i = 0; i < 500000; i++)
+            //for(int i = 0; i < 50000; i++)
             drone.move(0, 0, 0, -0.9f);
             Thread.sleep(3000);
             
             // Turn Right
             System.out.println("Right");
-            for(int i = 0; i < 500000; i++)
+            //for(int i = 0; i < 50000; i++)
             	drone.move(0, 0, 0, 0.9f);
             Thread.sleep(3000);
            
  			//Move Backward
             System.out.println("Backward");
-            for(int i = 0; i < 1000000; i++)
-            drone.move(0, 0.9f, 0, 0);
+            //for(int i = 0; i < 100000; i++)
+            drone.move(0, 0.5f, 0, 0);
             Thread.sleep(3000);
 
           

@@ -1,7 +1,9 @@
 
 package com.codeminders.ardrone;
 
-import java.awt.image.BufferedImage;
+import android.os.AsyncTask;
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.*;
 import java.util.LinkedList;
@@ -11,6 +13,8 @@ import org.apache.log4j.Logger;
 
 import com.codeminders.ardrone.NavData.FlyingState;
 import com.codeminders.ardrone.commands.*;
+import com.example.rseljeii.ar_drone.AsyncTaskCommand;
+import com.example.rseljeii.ar_drone.AsyncTaskNav;
 
 public class ARDrone
 {
@@ -94,7 +98,7 @@ public class ARDrone
 
     private Logger                          log               = Logger.getLogger(getClass().getName());
 
-    private static final int                CMD_QUEUE_SIZE    = 64;
+    private static final int                CMD_QUEUE_SIZE    = 128;        // was 64
     private State                           state             = State.DISCONNECTED;
     private Object                          state_mutex       = new Object();
 
@@ -111,12 +115,16 @@ public class ARDrone
     private CommandQueue                    cmd_queue         = new CommandQueue(CMD_QUEUE_SIZE);
 
     private NavDataReader                   nav_data_reader;
-    private VideoReader                     video_reader;
+    //private VideoReader                     video_reader;
     private CommandSender                   cmd_sender;
 
-    private Thread                          nav_data_reader_thread;
-    private Thread                          cmd_sending_thread;
-    private Thread                          video_reader_thread;
+    //private Thread                          nav_data_reader_thread;
+    //private Thread                          cmd_sending_thread;
+    //private Thread                          video_reader_thread;
+
+    // AsyncTask
+    AsyncTaskCommand cmd_sending_thread;
+    AsyncTaskNav nav_data_reader_thread;
 
     private boolean                         combinedYawMode   = true;
 
@@ -124,14 +132,12 @@ public class ARDrone
     private Object                          emergency_mutex   = new Object();
 
     private List<DroneStatusChangeListener> status_listeners  = new LinkedList<DroneStatusChangeListener>();
-    private List<DroneVideoListener>        image_listeners   = new LinkedList<DroneVideoListener>();
+    //private List<DroneVideoListener>        image_listeners   = new LinkedList<DroneVideoListener>();
     private List<NavDataListener>           navdata_listeners = new LinkedList<NavDataListener>();
 
     public ARDrone() throws UnknownHostException
     {
         this(InetAddress.getByAddress(DEFAULT_DRONE_IP));
-		System.out.println("\tAddress: " + InetAddress.getByAddress(DEFAULT_DRONE_IP));
-		System.out.print(log.toString());
     }
 
     public ARDrone(InetAddress drone_addr)
@@ -139,6 +145,7 @@ public class ARDrone
         this.drone_addr = drone_addr;
     }
 
+    /*
     public void addImageListener(DroneVideoListener l)
     {
         synchronized(image_listeners)
@@ -162,6 +169,7 @@ public class ARDrone
             image_listeners.clear();
         }
     }
+    */
 
     public void addStatusChangeListener(DroneStatusChangeListener l)
     {
@@ -213,17 +221,14 @@ public class ARDrone
 
     private void changeState(State newstate) throws IOException
     {
-        
-    	System.out.println("\tInside changeState(): " + newstate);
-    	
-    	if(newstate == State.ERROR)
+        if(newstate == State.ERROR)
             changeToErrorState(null);
 
         synchronized(state_mutex)
         {
             if(state != newstate)
             {
-                //log.debug("State changed from " + state + " to " + newstate);
+                log.debug("State changed from " + state + " to " + newstate);
                 state = newstate;
 
                 // We automatically switch to DEMO from bootstrap
@@ -242,7 +247,7 @@ public class ARDrone
                     l.ready();
             }
         }
-    } // end of changeState()
+    }
 
     public void changeToErrorState(Exception ex)
     {
@@ -278,41 +283,31 @@ public class ARDrone
      */
     public void connect() throws IOException
     {
-		System.out.println("\tInside Connect");
+        String temp;
         try
         {
-            System.out.println("\t\tTest1");
-			cmd_socket = new DatagramSocket();
+            cmd_socket = new DatagramSocket();
             // control_socket = new Socket(drone_addr, CONTROL_PORT);
-			
-			System.out.println("\t\tTest2");
+
             cmd_sender = new CommandSender(cmd_queue, this, drone_addr, cmd_socket);
-            cmd_sending_thread = new Thread(cmd_sender);
-            cmd_sending_thread.start();
+            cmd_sending_thread = new AsyncTaskCommand();
+            cmd_sending_thread.execute(cmd_sender);
 
-			System.out.println("\t\tTest3");
             nav_data_reader = new NavDataReader(this, drone_addr, NAVDATA_PORT);
-            nav_data_reader_thread = new Thread(nav_data_reader);
-            nav_data_reader_thread.start();
+            nav_data_reader_thread = new AsyncTaskNav();
+            nav_data_reader_thread.execute(nav_data_reader);
 
-			System.out.println("\t\tTest4");
-            video_reader = new VideoReader(this, drone_addr, VIDEO_PORT);
-            video_reader_thread = new Thread(video_reader);
-            video_reader_thread.start();
+            //video_reader = new VideoReader(this, drone_addr, VIDEO_PORT);
+            //video_reader_thread = new Thread(video_reader);
+            //video_reader_thread.start();
 
-			System.out.println("\t\tTest5");
-            System.out.println("\t\tState: " + State.CONNECTING);
             changeState(State.CONNECTING);
 
-			System.out.println("\t\tTest6");
         } catch(IOException ex)
         {
-			System.out.println("\\nt\tERROR\n");
             changeToErrorState(ex);
             throw ex;
         }
-        
-        System.out.print("\t\tstate_mutex: " + state_mutex.toString());
     }
 
     public void disableAutomaticVideoBitrate() throws IOException
@@ -339,8 +334,8 @@ public class ARDrone
         if(nav_data_reader != null)
             nav_data_reader.stop();
 
-        if(video_reader != null)
-            video_reader.stop();
+        //if(video_reader != null)
+            //video_reader.stop();
 
         if(cmd_socket != null)
             cmd_socket.close();
@@ -414,9 +409,9 @@ public class ARDrone
      *            the drone spin right; a negative value makes it spin left.
      * @throws IOException
      */
-    public void move(float left_right_tilt, float front_back_tilt, float vertical_speed, float angular_speed)
-            throws IOException
+    public void move(float left_right_tilt, float front_back_tilt, float vertical_speed, float angular_speed) throws IOException
     {
+        Log.i("ARDrone", "Command Added");
         cmd_queue.add(new MoveCommand(combinedYawMode, left_right_tilt, front_back_tilt, vertical_speed, angular_speed));
         cmd_queue.print();
     }
@@ -588,12 +583,11 @@ public class ARDrone
 
     public void trim() throws IOException
     {
-        System.out.println("\tInside Trim");
-		cmd_queue.add(new FlatTrimCommand());
-		System.out.println("\tLeaving Trim");
+        cmd_queue.add(new FlatTrimCommand());
     }
 
     // Callback used by VideoReciver
+    /*
     public void videoFrameReceived(BufferedImage image)
     {
         synchronized(image_listeners)
@@ -602,7 +596,7 @@ public class ARDrone
                 l.frameReceived(image);
         }
     }
-
+    */
     /**
      * Wait for drone to switch to demo mode. Throw exception if this not
      * succeeded within given timeout. Should be called right after connect().
