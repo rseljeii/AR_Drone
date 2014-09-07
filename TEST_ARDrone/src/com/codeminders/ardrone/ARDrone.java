@@ -97,9 +97,10 @@ public class ARDrone
     private static final int                CMD_QUEUE_SIZE    = 64;
     private State                           state             = State.DISCONNECTED;
     private Object                          state_mutex       = new Object();
+    private static Boolean					flag   			  = true;
 
-    private static final int                NAVDATA_PORT      = 5554;
-    private static final int                VIDEO_PORT        = 5555;
+    private static final int                NAVDATA_PORT      = 5605;				//5554
+    private static final int                VIDEO_PORT        = 5610;				//5553
     // private static final int CONTROL_PORT = 5559;
 
     private static byte[]                   DEFAULT_DRONE_IP  = { (byte) 192, (byte) 168, (byte) 1, (byte) 1 };
@@ -137,6 +138,7 @@ public class ARDrone
     public ARDrone(InetAddress drone_addr)
     {
         this.drone_addr = drone_addr;
+        System.out.println("\tAddress: " + drone_addr.toString());
     }
 
     public void addImageListener(DroneVideoListener l)
@@ -281,25 +283,33 @@ public class ARDrone
 		System.out.println("\tInside Connect");
         try
         {
-            System.out.println("\t\tTest1");
-			cmd_socket = new DatagramSocket();
+            cmd_socket = new DatagramSocket();
             // control_socket = new Socket(drone_addr, CONTROL_PORT);
 			
-			System.out.println("\t\tTest2");
-            cmd_sender = new CommandSender(cmd_queue, this, drone_addr, cmd_socket);
+			cmd_sender = new CommandSender(cmd_queue, this, drone_addr, cmd_socket);
             cmd_sending_thread = new Thread(cmd_sender);
             cmd_sending_thread.start();
-
-			System.out.println("\t\tTest3");
-            nav_data_reader = new NavDataReader(this, drone_addr, NAVDATA_PORT);
-            nav_data_reader_thread = new Thread(nav_data_reader);
-            nav_data_reader_thread.start();
-
-			System.out.println("\t\tTest4");
+            
+			if(flag)
+			{
+				nav_data_reader = new NavDataReader(this, drone_addr, NAVDATA_PORT);
+				nav_data_reader_thread = new Thread(nav_data_reader);	
+	            nav_data_reader_thread.start();	
+	            flag = false;
+			}
+			else
+			{
+				nav_data_reader = new NavDataReader(this, drone_addr, VIDEO_PORT);
+				nav_data_reader_thread = new Thread(nav_data_reader);	
+	            nav_data_reader_thread.start();	
+	            flag = true;
+			}
+			
+			/*
             video_reader = new VideoReader(this, drone_addr, VIDEO_PORT);
             video_reader_thread = new Thread(video_reader);
             video_reader_thread.start();
-
+			*/
 			System.out.println("\t\tTest5");
             System.out.println("\t\tState: " + State.CONNECTING);
             changeState(State.CONNECTING);

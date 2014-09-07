@@ -52,7 +52,7 @@ public class CommandQueue
         int p = cmd.getPriority();
         int pos = -1;
 
-        Log.i("CommandQueue", "ADDING Category: " + cmd.getCategory() + " Priority: " + cmd.getPriority()+ " CMD: " + cmd);
+        //Log.i("CommandQueue", "ADDING Category: " + cmd.getCategory() + " Priority: " + cmd.getPriority()+ " CMD: " + cmd);
 
         while(i.hasNext())
         {
@@ -69,13 +69,13 @@ public class CommandQueue
                 if(!x.replaces(cmd))
                 {
                     // log.debug("Replacing duplicate element " + cmd);
-                    Log.i("CommandQueue", "Replacing duplicate element " + cmd);
+                    //Log.i("CommandQueue", "Replacing duplicate element " + cmd);
                     data.add(pos, cmd);
                     notify();
                 } else
                 {
                     // log.debug("Replacing duplicate element " + cmd);
-                    Log.i("ConnandQueue", "Replacing duplicate element " + cmd);
+                    //Log.i("CommandQueue", "Replacing duplicate element " + cmd);
                     data.set(pos, cmd);
                 }
                 cmd = null; // inserted

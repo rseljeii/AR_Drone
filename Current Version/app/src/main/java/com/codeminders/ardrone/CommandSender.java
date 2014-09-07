@@ -38,7 +38,7 @@ public class CommandSender implements Runnable
             try
             {
                 DroneCommand c = cmd_queue.take();
-                System.out.println("Run() Category" + c.getCategory() + " Priority: " + c.getPriority() + " CMD " + c);
+                //System.out.println("Run() Category" + c.getCategory() + " Priority: " + c.getPriority() + " CMD " + c);
                 //Log.i("CommandSender", "Run() Category" + c.getCategory() + " Priority: " + c.getPriority() + " CMD " + c);
                 if(c instanceof QuitCommand)
                 {

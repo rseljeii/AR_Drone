@@ -1,6 +1,8 @@
 
 package com.codeminders.ardrone.commands;
 
+import android.util.Log;
+
 import java.io.UnsupportedEncodingException;
 
 import com.codeminders.ardrone.DroneCommand;
@@ -23,6 +25,9 @@ public abstract class ATCommand extends DroneCommand
 
     public String getCommandString(int seq)
     {
+        //Log.i("ATCOMMAND", "getID: " + getID());
+        //Log.i("ATCOMMAND", "seq: " + seq);
+        //Log.i("ATCOMMAND", "getParametersString(): " + getParametersString());
         return "AT*" + getID() + "=" + seq + getParametersString() + "\r";
     }
 

@@ -21,7 +21,7 @@ public class NavDataReader implements Runnable
     public NavDataReader(ARDrone drone, InetAddress drone_addr, int navdata_port) throws IOException
     {
         this.drone = drone;
-        
+        System.out.println("\t\t\tTest3\tdrone_addr: " + drone_addr + "\tnavdata_port: " + navdata_port);
         channel = DatagramChannel.open();
         channel.configureBlocking(false);
         channel.socket().bind(new InetSocketAddress(navdata_port));

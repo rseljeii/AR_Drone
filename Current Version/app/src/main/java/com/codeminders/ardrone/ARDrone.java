@@ -101,9 +101,11 @@ public class ARDrone
     private static final int                CMD_QUEUE_SIZE    = 128;        // was 64
     private State                           state             = State.DISCONNECTED;
     private Object                          state_mutex       = new Object();
+    private Boolean                         flag              = true;
 
-    private static final int                NAVDATA_PORT      = 5554;
-    private static final int                VIDEO_PORT        = 5555;
+    private static final int                NAVDATA_PORT      = 5554;                                    //GOOD PORT(same)
+    private static final int                VIDEO_PORT        = 5555;                                    //5555;
+    private static int                      testNum           = 5566;
     // private static final int CONTROL_PORT = 5559;
 
     private static byte[]                   DEFAULT_DRONE_IP  = { (byte) 192, (byte) 168, (byte) 1, (byte) 1 };
@@ -293,22 +295,42 @@ public class ARDrone
             cmd_sending_thread = new AsyncTaskCommand();
             cmd_sending_thread.execute(cmd_sender);
 
+            /*
             nav_data_reader = new NavDataReader(this, drone_addr, NAVDATA_PORT);
             nav_data_reader_thread = new AsyncTaskNav();
             nav_data_reader_thread.execute(nav_data_reader);
+            */
 
+            if(flag)
+            {
+                //nav_data_reader = new NavDataReader(this, drone_addr, NAVDATA_PORT);
+                nav_data_reader = new NavDataReader(this, drone_addr, VIDEO_PORT);
+                nav_data_reader_thread = new AsyncTaskNav();
+                nav_data_reader_thread.execute(nav_data_reader);
+                //flag = false;
+            }
+            else
+            {
+                //nav_data_reader = new NavDataReader(this, drone_addr, VIDEO_PORT);
+                nav_data_reader = new NavDataReader(this, drone_addr, NAVDATA_PORT);
+                nav_data_reader_thread = new AsyncTaskNav();
+                nav_data_reader_thread.execute(nav_data_reader);
+                flag = true;
+            }
             //video_reader = new VideoReader(this, drone_addr, VIDEO_PORT);
             //video_reader_thread = new Thread(video_reader);
             //video_reader_thread.start();
 
             changeState(State.CONNECTING);
 
-        } catch(IOException ex)
+        }
+        catch(IOException ex)
         {
             changeToErrorState(ex);
             throw ex;
         }
     }
+
 
     public void disableAutomaticVideoBitrate() throws IOException
     {

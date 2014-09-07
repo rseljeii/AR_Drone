@@ -1,6 +1,7 @@
 package com.example.rseljeii.ar_drone;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -16,6 +17,8 @@ import com.codeminders.ardrone.ARDrone;
 public class FlightMode extends Activity
 {
     Boolean liftoff = false;
+    Boolean pressedUp = false;
+    int i = 0;
 
     // http://drones.johnback.us/
     ARDrone ardrone, ardrone2;
@@ -92,7 +95,6 @@ public class FlightMode extends Activity
             {
                 Log.i("FlightMode setup()", "Taking off");
                 ardrone.takeOff();
-                ardrone.hover();
             }
             catch(Throwable e)
             {
@@ -118,6 +120,21 @@ public class FlightMode extends Activity
             }
         }
     } // end of liftoff_land()
+
+    private void moveDrone(float one, float two, float three, float four)
+    {
+        try
+        {
+            Log.i("FlightMode", "START moveDrone");
+            //for(int i = 0; i < 50000; i++)
+                ardrone.move(one, two, three, four);
+            Log.i("FlightMode", "END moveDrone");
+        }
+        catch(Throwable e)
+        {
+            e.printStackTrace();
+        }
+    } // end of moveDrone()
 
     // Buttons Listener
     private void Take_Land_Button()
@@ -150,34 +167,68 @@ public class FlightMode extends Activity
             Only the air resistance will then make it stop.
          */
 
-        // Get Reference to the button
-        final Button button = (Button)findViewById(R.id.Back_Button);
-
-        // Set the click listener to the button
-        button.setOnClickListener(new View.OnClickListener()
+        class BackButton extends AsyncTask<Void, Void, Void>
         {
-            public void onClick(View v)
+            @Override
+            protected Void doInBackground(Void... arg0)
             {
-                //Toast.makeText(FlightMode.this, "Back", Toast.LENGTH_LONG).show();
+                Log.i("Flight Mode","Back BUTTON TEST");
+                for(int i = 0; i < 50; i++)
+                    moveDrone(0, 09f, 0, 0);
+                Back_Button();
+                return null;
+            }
+        }
+        final Button button = (Button)findViewById(R.id.Back_Button);
+        button.setOnTouchListener(new View.OnTouchListener() {
 
-                try
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction())
                 {
-                    while(button.isPressed())
-                    {
-                        ardrone.move(0, 09f, 0, 0);
-                        Log.i("FlightMode", "Move Back");
-                    }
-
-                    //Toast.makeText(FlightMode.this, "Back", Toast.LENGTH_LONG).show();
+                    case MotionEvent.ACTION_DOWN:
+                        pressedUp = true;
+                        new BackButton().doInBackground();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        pressedUp = false;
+                        break;
                 }
-                catch(Throwable e)
+                return true;
+            }
+
+
+
+
+
+
+
+
+            /*
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
                 {
-                    e.printStackTrace();
+                    pressedUp = true;
+                    Log.i("FlightMode", "Action Down");
+                    new LeftButton().doInBackground();
+                    Log.i("FlightMode", "PostTest");
                 }
-            } // end of onClick()
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    pressedUp = false;
+                    Log.i("FlightMode", "Action Up");
+                }
+                return true;
+            }*/
 
-         } // end of View.OnClickListener()
-        );
+
+
+
+        });
     } // end of Back_Button
 
     private void Down_Button()
@@ -188,31 +239,68 @@ public class FlightMode extends Activity
             A positive value makes the drone rise in the air.
             A negative value makes it go down.
          */
-        // Get Reference to the button
-        final Button button = (Button)findViewById(R.id.Down_Button);
 
-        // Set the click listener to the button
-        button.setOnClickListener(new View.OnClickListener()
+        class DownButton extends AsyncTask<Void, Void, Void>
         {
-            public void onClick(View v)
+            @Override
+            protected Void doInBackground(Void... arg0)
             {
-                //Toast.makeText(FlightMode.this, "Down", Toast.LENGTH_LONG).show();
+                Log.i("Flight Mode","Down BUTTON TEST");
+                moveDrone(0, 0, -0.9f, 0);
+                Down_Button();
+                return null;
+            }
+        }
+        final Button button = (Button)findViewById(R.id.Down_Button);
+        button.setOnTouchListener(new View.OnTouchListener() {
 
-                try
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction())
                 {
-                    while(button.isPressed())
-                    {
-                        ardrone.move(0, 0, -0.9f, 0);
-                        Log.i("FlightMode", "Move Down");
-                    }
+                    case MotionEvent.ACTION_DOWN:
+                        pressedUp = true;
+                        new DownButton().doInBackground();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        pressedUp = false;
+                        break;
                 }
-                catch(Throwable e)
+                return true;
+            }
+
+
+
+
+
+
+
+
+            /*
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
                 {
-                    e.printStackTrace();
+                    pressedUp = true;
+                    Log.i("FlightMode", "Action Down");
+                    new LeftButton().doInBackground();
+                    Log.i("FlightMode", "PostTest");
                 }
-            } // end of onClick()
-        } // end of View.OnClickListener()
-        );
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    pressedUp = false;
+                    Log.i("FlightMode", "Action Up");
+                }
+                return true;
+            }*/
+
+
+
+
+        });
     } // end of Down_Button
 
     private void Forward_Button()
@@ -228,33 +316,38 @@ public class FlightMode extends Activity
             Only the air resistance will then make it stop.
          */
 
-        // Get Reference to the button
-        final Button button = (Button)findViewById(R.id.Forward_Button);
-
-        // Set the click listener to the button
-        button.setOnClickListener(new View.OnClickListener()
+        class ForwardButton extends AsyncTask<Void, Void, Void>
         {
-            public void onClick(View v)
+
+            @Override
+            protected Void doInBackground(Void... arg0)
             {
-                //Toast.makeText(FlightMode.this, "Forward", Toast.LENGTH_LONG).show();
+                Log.i("Flight Mode","Forward BUTTON TEST");
+                for(int i = 0; i < 50; i++)
+                    moveDrone(0, -0.9f, 0, 0);
+                Forward_Button();
+                return null;
+            }
+        }
+        final Button button = (Button)findViewById(R.id.Forward_Button);
+        button.setOnTouchListener(new View.OnTouchListener() {
 
-                try
-                {
-                    while(button.isPressed())
-                    {
-                        ardrone.move(0, -0.9f, 0, 0);
-                        Log.i("FlightMode", "Move Forward");
-                    }
 
-                    //Toast.makeText(FlightMode.this, "Forward", Toast.LENGTH_LONG).show();
-                }
-                catch(Throwable e)
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction())
                 {
-                    e.printStackTrace();
+                    case MotionEvent.ACTION_DOWN:
+                        pressedUp = true;
+                        new ForwardButton().doInBackground();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        pressedUp = false;
+                        break;
                 }
-            } // end of onClick()
-        } // end of View.OnClickListener()
-        );
+                return true;
+            }
+        });
     } // end of Forward_Button
 
     private void Up_Button()
@@ -266,31 +359,68 @@ public class FlightMode extends Activity
             A negative value makes it go down.
          */
 
-        // Get Reference to the button
-        final Button button = (Button)findViewById(R.id.Up_Button);
-
-        // Set the click listener to the button
-        button.setOnClickListener(new View.OnClickListener()
+        class UpButton extends AsyncTask<Void, Void, Void>
         {
-            public void onClick(View v)
-            {
-                //Toast.makeText(FlightMode.this, "Up", Toast.LENGTH_LONG).show();
 
-                try
+            @Override
+            protected Void doInBackground(Void... arg0)
+            {
+                Log.i("Flight Mode","Up BUTTON TEST");
+                moveDrone(0, 0, 0.9f, 0);
+                Up_Button();
+                return null;
+            }
+        }
+        final Button button = (Button)findViewById(R.id.Up_Button);
+        button.setOnTouchListener(new View.OnTouchListener() {
+
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction())
                 {
-                    while(button.isPressed())
-                    {
-                        ardrone.move(0, 0, 0.9f, 0);
-                        Log.i("FlightMode", "Move Up");
-                    }
+                    case MotionEvent.ACTION_DOWN:
+                        pressedUp = true;
+                        new UpButton().doInBackground();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        pressedUp = false;
+                        break;
                 }
-                catch(Throwable e)
+                return true;
+            }
+
+
+
+
+
+
+
+
+            /*
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
                 {
-                    e.printStackTrace();
+                    pressedUp = true;
+                    Log.i("FlightMode", "Action Down");
+                    new LeftButton().doInBackground();
+                    Log.i("FlightMode", "PostTest");
                 }
-            } // end of onClick()
-        } // end of View.OnClickListener()
-        );
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    pressedUp = false;
+                    Log.i("FlightMode", "Action Up");
+                }
+                return true;
+            }*/
+
+
+
+
+        });
     } // end of Up_Button
 
     private void Left_Button()
@@ -302,32 +432,72 @@ public class FlightMode extends Activity
             A positive value makes the drone spin right.
             A negative value makes it spin left.
         */
-
-        // Get Reference to the button
-        final Button button = (Button)findViewById(R.id.Left_Button);
-
-        // Set the click listener to the button
-        button.setOnClickListener(new View.OnClickListener()
+        class LeftButton extends AsyncTask<Void, Void, Void>
         {
-            public void onClick(View v)
+            @Override
+            protected Void doInBackground(Void... arg0)
             {
-                //Toast.makeText(FlightMode.this, "Left", Toast.LENGTH_LONG).show();
+                Toast.makeText(FlightMode.this, "Left", Toast.LENGTH_LONG).show();
+                Log.i("Flight Mode","LEFT BUTTON TEST");
+                for(int i = 0; i < 50; i++)
+                    moveDrone(0, 0, 0, -0.9f);
+                Left_Button();
+                return null;
+            }
+        }
+        final Button button = (Button)findViewById(R.id.Left_Button);
+        button.setOnTouchListener(new View.OnTouchListener() {
 
-                try
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction())
                 {
-                    while(button.isPressed())
-                    {
-                        ardrone.move(0, 0, 0, -10);
-                        Log.i("FlightMode", "Move Left");
-                    }
+                    case MotionEvent.ACTION_DOWN:
+                        pressedUp = true;
+                        Log.i("FlightMode", "Action Down");
+                        new LeftButton().doInBackground();
+                        Log.i("FlightMode", "PostTest: " + i++);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        pressedUp = false;
+                        Log.i("FlightMode", "Action Up");
+                        break;
                 }
-                catch(Throwable e)
+                return true;
+            }
+
+
+
+
+
+
+
+
+            /*
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
                 {
-                    e.printStackTrace();
+                    pressedUp = true;
+                    Log.i("FlightMode", "Action Down");
+                    new LeftButton().doInBackground();
+                    Log.i("FlightMode", "PostTest");
                 }
-            } // end of onClick()
-        } // end of View.OnClickListener()
-        );
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    pressedUp = false;
+                    Log.i("FlightMode", "Action Up");
+                }
+                return true;
+            }*/
+
+
+
+
+        });
     } // end of Up_Button
 
     private void Right_Button()
@@ -339,32 +509,68 @@ public class FlightMode extends Activity
             A positive value makes the drone spin right.
             A negative value makes it spin left.
         */
-
-        // Get Reference to the button
-        final Button button = (Button)findViewById(R.id.Right_Button);
-
-        // Set the click listener to the button
-        button.setOnClickListener(new View.OnClickListener()
+        class RightButton extends AsyncTask<Void, Void, Void>
         {
-            public void onClick(View v)
-            {
-                Log.i("FlightMode", "YOU CLICK ON THE RIGHT BUTTON");
-                //Toast.makeText(FlightMode.this, "Right", Toast.LENGTH_LONG).show();
 
-                try
+            @Override
+            protected Void doInBackground(Void... arg0)
+            {
+                Log.i("Flight Mode","Right BUTTON TEST");
+                for(int i = 0; i < 50; i++)
+                    moveDrone(0, 0, 0, 0.9f);
+                Left_Button();
+                return null;
+            }
+        }
+        final Button button = (Button)findViewById(R.id.Right_Button);
+        button.setOnTouchListener(new View.OnTouchListener() {
+
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction())
                 {
-                    while(button.isPressed())
-                    {
-                        ardrone.move(0, 0, 0, 0.9f);
-                        Log.i("FlightMode", "Move Right");
-                    }
+                    case MotionEvent.ACTION_DOWN:
+                        pressedUp = true;
+                        new RightButton().doInBackground();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        pressedUp = false;
+                        break;
                 }
-                catch(Throwable e)
+                return true;
+            }
+
+
+
+
+
+
+
+
+            /*
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_DOWN)
                 {
-                    e.printStackTrace();
+                    pressedUp = true;
+                    Log.i("FlightMode", "Action Down");
+                    new LeftButton().doInBackground();
+                    Log.i("FlightMode", "PostTest");
                 }
-            } // end of onClick()
-        } // end of View.OnClickListener()
-        );
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    pressedUp = false;
+                    Log.i("FlightMode", "Action Up");
+                }
+                return true;
+            }*/
+
+
+
+
+        });
     } // end of Right_Button
 } // end of class

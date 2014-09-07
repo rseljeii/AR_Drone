@@ -2,11 +2,7 @@ package com.codeminders.ardrone.commands;
 
 public class MoveCommand extends PCMDCommand
 {
-    public MoveCommand(boolean combined_yaw_enabled,
-                       float   left_right_tilt,
-                       float   front_back_tilt,
-                       float   vertical_speed,
-                       float   angular_speed)
+    public MoveCommand(boolean combined_yaw_enabled,float left_right_tilt, float front_back_tilt, float vertical_speed, float angular_speed)
     {
         super(false);
         this.combined_yaw_enabled = combined_yaw_enabled;

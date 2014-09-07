@@ -49,7 +49,7 @@ public class CommandQueue
         int p = cmd.getPriority();
         int pos = -1;
         
-        System.out.println("ADD COMMAND: " + cmd);
+        //System.out.println("ADD COMMAND: " + cmd);
 
         while(i.hasNext())
         {
@@ -88,7 +88,7 @@ public class CommandQueue
 
         if(data.size() > maxSize)
         {
-            System.out.println("if(data.size() > maxSize)");
+            //System.out.println("if(data.size() > maxSize)");
             // TODO: trim
         }
     }
@@ -114,7 +114,7 @@ public class CommandQueue
         
         while(next.peek() != null)
         {
-            System.out.println("\t\tCOMMAND " + i++ + ": " + next.pop());
+            //System.out.println("\t\tCOMMAND " + i++ + ": " + next.pop());
         }
     }
 

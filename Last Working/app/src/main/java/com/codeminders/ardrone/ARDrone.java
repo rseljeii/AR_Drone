@@ -98,7 +98,7 @@ public class ARDrone
 
     private Logger                          log               = Logger.getLogger(getClass().getName());
 
-    private static final int                CMD_QUEUE_SIZE    = 64;
+    private static final int                CMD_QUEUE_SIZE    = 128;        // was 64
     private State                           state             = State.DISCONNECTED;
     private Object                          state_mutex       = new Object();
 
@@ -123,7 +123,7 @@ public class ARDrone
     //private Thread                          video_reader_thread;
 
     // AsyncTask
-    AsyncTaskCommand cmd_sending_thread;;
+    AsyncTaskCommand cmd_sending_thread;
     AsyncTaskNav nav_data_reader_thread;
 
     private boolean                         combinedYawMode   = true;
@@ -409,11 +409,11 @@ public class ARDrone
      *            the drone spin right; a negative value makes it spin left.
      * @throws IOException
      */
-    public void move(float left_right_tilt, float front_back_tilt, float vertical_speed, float angular_speed)
-            throws IOException
+    public void move(float left_right_tilt, float front_back_tilt, float vertical_speed, float angular_speed) throws IOException
     {
-        cmd_queue
-                .add(new MoveCommand(combinedYawMode, left_right_tilt, front_back_tilt, vertical_speed, angular_speed));
+        Log.i("ARDrone", "Command Added");
+        cmd_queue.add(new MoveCommand(combinedYawMode, left_right_tilt, front_back_tilt, vertical_speed, angular_speed));
+        cmd_queue.print();
     }
 
     // Callback used by receiver

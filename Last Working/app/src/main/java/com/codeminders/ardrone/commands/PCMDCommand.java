@@ -1,5 +1,7 @@
 package com.codeminders.ardrone.commands;
 
+import android.util.Log;
+
 public class PCMDCommand extends ATCommand
 {
     protected boolean hover;
@@ -31,6 +33,12 @@ public class PCMDCommand extends ATCommand
         int mode = 1;
         if(combined_yaw_enabled)
             mode |= (1<<1);
+
+        //Log.i("PCMDCommand", "mode: " + mode);
+        //Log.i("PCMDCommand", "left_right: " + left_right_tilt);
+        //Log.i("PCMDCommand", "front_back: " + front_back_tilt);
+        //Log.i("PCMDCommand", "vertical_speed: " + vertical_speed);
+        //Log.i("PCMDCommand", "angular_speed: " + angular_speed);
 
         return new Object[] { mode, left_right_tilt, front_back_tilt, vertical_speed, angular_speed };
     }

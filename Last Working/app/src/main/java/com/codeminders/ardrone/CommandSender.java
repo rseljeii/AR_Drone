@@ -1,6 +1,8 @@
 
 package com.codeminders.ardrone;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.*;
 
@@ -18,7 +20,7 @@ public class CommandSender implements Runnable
     private DatagramSocket   cmd_socket;
     private int              sequence = 1;
 
-    private Logger           log      = Logger.getLogger(getClass().getName());
+    //private Logger           log      = Logger.getLogger(getClass().getName());
 
     public CommandSender(CommandQueue cmd_queue, ARDrone drone, InetAddress drone_addr, DatagramSocket cmd_socket)
     {
@@ -36,6 +38,8 @@ public class CommandSender implements Runnable
             try
             {
                 DroneCommand c = cmd_queue.take();
+                System.out.println("Run() Category" + c.getCategory() + " Priority: " + c.getPriority() + " CMD " + c);
+                //Log.i("CommandSender", "Run() Category" + c.getCategory() + " Priority: " + c.getPriority() + " CMD " + c);
                 if(c instanceof QuitCommand)
                 {
                     // Terminating
@@ -46,7 +50,7 @@ public class CommandSender implements Runnable
                 {
                     ATCommand cmd = (ATCommand) c;
                     //if(!(c instanceof KeepAliveCommand) && !(c instanceof MoveCommand) && !(c instanceof HoverCommand) && c.getStickyCounter()==0)
-                        log.debug("Q[" + cmd_queue.size() + "]Sending AT command " + c);
+                        //log.debug("Q[" + cmd_queue.size() + "]Sending AT command " + c);
                     byte[] pdata = cmd.getPacket(sequence++); // TODO: pass
                                                               // sequence number
                     DatagramPacket p = new DatagramPacket(pdata, pdata.length, drone_addr, CMD_PORT);

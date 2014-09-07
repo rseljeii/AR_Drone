@@ -6,16 +6,17 @@ import android.util.Log;
 import com.codeminders.ardrone.NavDataReader;
 
 /**
- * Created by rseljeii on 7/29/2014.
+ * Created by rseljeii on 8/17/2014.
  */
-public class AsyncTaskNav extends AsyncTask<NavDataReader, Void, String>
+public class AsyncCommandSender extends AsyncTask<NavDataReader, Void, String>
 {
     @Override
     protected String doInBackground(NavDataReader... params)
     {
-        Log.i("NavDataManager", "DOING SOMETHING");
+        Log.i("AsyncCommandSender", "DOING SOMETHING");
 
-        params[0].run();
+
+
         return "Executed";
     }
 
@@ -24,7 +25,7 @@ public class AsyncTaskNav extends AsyncTask<NavDataReader, Void, String>
         //TextView txt = (TextView) findViewById(R.id.output);
         //txt.setText("Executed"); // txt.setText(result);
 
-        Log.i("AsyncTask", "Executed");
+        Log.i("AsyncCommandSender", "Executed");
     }
 
     @Override
@@ -33,4 +34,4 @@ public class AsyncTaskNav extends AsyncTask<NavDataReader, Void, String>
     @Override
     protected void onProgressUpdate(Void... values) {}
 
-} // end of class
+} // end of AsyncCommandSender class

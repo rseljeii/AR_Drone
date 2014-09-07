@@ -1,6 +1,8 @@
 
 package com.codeminders.ardrone;
 
+import android.util.Log;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -27,6 +29,7 @@ public class CommandQueue
             if(res != null)
             {
                 // log.debug("[" + data.size() + "] Returning " + res);
+                //.i("Command Queue", "[" + data.size() + "] Returning " + res);
                 if(res.isSticky())
                 {
                     int sc = res.incrementStickyCounter();
@@ -49,6 +52,8 @@ public class CommandQueue
         int p = cmd.getPriority();
         int pos = -1;
 
+        Log.i("CommandQueue", "ADDING Category: " + cmd.getCategory() + " Priority: " + cmd.getPriority()+ " CMD: " + cmd);
+
         while(i.hasNext())
         {
             DroneCommand x = i.next();
@@ -63,13 +68,14 @@ public class CommandQueue
                 // Found insertion point.
                 if(!x.replaces(cmd))
                 {
-                    // log.debug("[" + data.size() + "] Adding command " +
-                    // cmd);
+                    // log.debug("Replacing duplicate element " + cmd);
+                    Log.i("CommandQueue", "Replacing duplicate element " + cmd);
                     data.add(pos, cmd);
                     notify();
                 } else
                 {
                     // log.debug("Replacing duplicate element " + cmd);
+                    Log.i("ConnandQueue", "Replacing duplicate element " + cmd);
                     data.set(pos, cmd);
                 }
                 cmd = null; // inserted
@@ -100,5 +106,29 @@ public class CommandQueue
         data.clear();
         notify();
     }
+
+
+
+
+    public synchronized void print()
+    {
+        LinkedList<DroneCommand> next = data;
+        int i = 0;
+
+        while(next != null)
+        {
+            Log.i("CommandQueue", "\t\tCOMMAND " + i + ": " + next.pop());
+        }
+    }
+
+
+
+
+
+
+
+
+
+
 
 }
