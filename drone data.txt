@@ -1,0 +1,28 @@
+DRONE 1 (Drone with nick in body)
+
+[network]
+ssid_single_player	= ardrone2_024288
+ssid_multi_player	= ardrone2_024288
+wifi_mode		= 0
+owner_mac		= 00:00:00:00:00:00
+
+
+
+/bin/wifi_setup.sh
+
+BASE_ADRESS=192.168.1.
+PROBE=1
+
+
+DRONE 2
+
+[network]
+ssid_single_player	= ardrone2_024100
+ssid_multi_player	= ardrone2_024100
+wifi_mode		= 0
+owner_mac		= 00:00:00:00:00:00
+
+/bin/wifi_setup.sh
+
+BASE_ADRESS=192.168.1.
+PROBE=1

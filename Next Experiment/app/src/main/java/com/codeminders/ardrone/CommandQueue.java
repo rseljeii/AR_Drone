@@ -1,0 +1,134 @@
+
+package com.codeminders.ardrone;
+
+import android.util.Log;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import org.apache.log4j.Logger;
+
+public class CommandQueue
+{
+    private LinkedList<DroneCommand> data;
+    private int                      maxSize;
+    @SuppressWarnings("unused")
+    private Logger                   log = Logger.getLogger(getClass().getName());
+
+    public CommandQueue(int maxSize)
+    {
+        data = new LinkedList<DroneCommand>();
+        this.maxSize = maxSize;
+    }
+
+    public synchronized DroneCommand take() throws InterruptedException
+    {
+        while(true)
+        {
+            DroneCommand res = data.pollLast();
+            if(res != null)
+            {
+                // log.debug("[" + data.size() + "] Returning " + res);
+                //.i("Command Queue", "[" + data.size() + "] Returning " + res);
+                if(res.isSticky())
+                {
+                    int sc = res.incrementStickyCounter();
+                    data.addLast(res);
+                    if(sc > 1)
+                        Thread.sleep(res.getStickyRate());
+                }
+                return res;
+            } else
+            {
+                // log.debug("Waiting for data");
+                wait();
+            }
+        }
+    }
+
+    public synchronized void add(DroneCommand cmd)
+    {
+        Iterator<DroneCommand> i = data.iterator();
+        int p = cmd.getPriority();
+        int pos = -1;
+
+        //Log.i("CommandQueue", "ADDING Category: " + cmd.getCategory() + " Priority: " + cmd.getPriority()+ " CMD: " + cmd);
+
+        while(i.hasNext())
+        {
+            DroneCommand x = i.next();
+            pos++;
+            int xp = x.getPriority();
+            if(xp < p)
+            {
+                // Skipping
+                continue;
+            } else
+            {
+                // Found insertion point.
+                if(!x.replaces(cmd))
+                {
+                    // log.debug("Replacing duplicate element " + cmd);
+                    //Log.i("CommandQueue", "Replacing duplicate element " + cmd);
+                    data.add(pos, cmd);
+                    notify();
+                } else
+                {
+                    // log.debug("Replacing duplicate element " + cmd);
+                    //Log.i("CommandQueue", "Replacing duplicate element " + cmd);
+                    data.set(pos, cmd);
+                }
+                cmd = null; // inserted
+                break;
+            }
+        }
+
+        if(cmd != null)
+        {
+            // log.debug("[" + data.size() + "] Adding command " + cmd);
+            data.addLast(cmd);
+            notify();
+        }
+
+        if(data.size() > maxSize)
+        {
+            // TODO: trim
+        }
+    }
+
+    public synchronized int size()
+    {
+        return data.size();
+    }
+
+    public synchronized void clear()
+    {
+        data.clear();
+        notify();
+    }
+
+
+
+
+    public synchronized void print()
+    {
+        LinkedList<DroneCommand> next = data;
+        int i = 0;
+
+        while(next != null)
+        {
+            Log.i("CommandQueue", "\t\tCOMMAND " + i + ": " + next.pop());
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+}
