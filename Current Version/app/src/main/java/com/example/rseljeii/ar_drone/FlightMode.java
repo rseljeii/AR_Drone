@@ -47,8 +47,46 @@ public class FlightMode extends Activity
 
             Log.i("FlightMode setup()", "CONNECT");
 
-            as1.doInBackground(ardrone);
-            as2.doInBackground(ardrone2);
+            final ARDrone ardrone_tmp1 = ardrone;
+            final ARDrone ardrone_tmp2 = ardrone2;
+
+            //as1.doInBackground(ardrone);
+            //as2.doInBackground(ardrone2);
+
+
+            new Thread(new Runnable()
+            {
+                public void run ()
+                {
+                    try
+                    {
+                        Thread.sleep(100);
+                        ardrone_tmp1.connect();
+                        Log.i("FlightMode setup()", "Drone 1: Connected");
+                    }
+                    catch(Throwable e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+
+            new Thread(new Runnable()
+            {
+                public void run ()
+                {
+                    try
+                    {
+                        Thread.sleep(100);
+                        ardrone_tmp2.connect();
+                        Log.i("FlightMode setup()", "Drone 2: Connected");
+                    }
+                    catch(Throwable e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
             /*
             ardrone.connect();          Log.i("FlightMode setup()", "CONNECT Drone1");
             wait(3000);
@@ -58,7 +96,7 @@ public class FlightMode extends Activity
             ardrone.clearEmergencySignal();
             ardrone2.clearEmergencySignal();
 
-            Log.i("FlightMode setup()", "Trim");
+            //Log.i("FlightMode setup()", "Trim");
 
             ardrone.trim();
             ardrone2.trim();
@@ -83,16 +121,16 @@ public class FlightMode extends Activity
 
         setup();
 
-        Log.i("FlightMode onCreate()", ("Finished Setup"));
+//        Log.i("FlightMode onCreate()", ("Finished Setup"));
 
         // Buttons
-        Take_Land_Button();Log.i("FlightMode onCreate()", ("Take_Land_Button"));
-        Back_Button();Log.i("FlightMode onCreate()", ("Back_Button"));
-        Down_Button();Log.i("FlightMode onCreate()", ("Down_Button"));
-        Forward_Button();Log.i("FlightMode onCreate()", ("Forward_Button"));
-        Up_Button();Log.i("FlightMode onCreate()", ("Up_Button"));
-        Left_Button();Log.i("FlightMode onCreate()", ("Left_Button"));
-        Right_Button();Log.i("FlightMode onCreate()", ("Right_Button"));
+        Take_Land_Button();
+        Back_Button();
+        Down_Button();
+        Forward_Button();
+        Up_Button();
+        Left_Button();
+        Right_Button();
     }
 
 
@@ -125,24 +163,55 @@ public class FlightMode extends Activity
             try
             {
                 Log.i("FlightMode setup()", "Taking off");
-                //ardrone.takeOff();
-                //ardrone2.takeOff();
+                final ARDrone ardrone_tmp1 = ardrone;
+                final ARDrone ardrone_tmp2 = ardrone2;
 
+                new Thread(new Runnable()
+                {
+                    public void run ()
+                    {
+                        try
+                        {
+                            Thread.sleep(100);
+                            ardrone_tmp2.takeOff();
+                            Thread.sleep(1000);
+                            Log.i("FlightMode setup()", "Drone 2: Taking off");
+                        }
+                        catch(Throwable e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
 
+                new Thread(new Runnable()
+                {
+                    public void run ()
+                    {
+                        try
+                        {
+                            ardrone_tmp1.takeOff();
+                            Thread.sleep(1000);
+                            Log.i("FlightMode setup()", "Drone 1: Taking off");
 
-                AsyncConnect as1 = new AsyncConnect();
-                as1.doInBackground(ardrone);
-                ardrone.takeOff();
-                ardrone.disconnect();
-
-                AsyncConnect as2 = new AsyncConnect();
-                as2.doInBackground(ardrone2);
-                ardrone2.takeOff();
-                ardrone2.disconnect();
-
+                        }
+                        catch(Throwable e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
             }
             catch(Throwable e)
             {
+                try
+                {
+                    ardrone.land();
+                    ardrone2.land();
+                }
+                catch(Throwable a)
+                { a.printStackTrace();}
+
                 e.printStackTrace();
             }
         }
@@ -154,14 +223,41 @@ public class FlightMode extends Activity
             try
             {
                 Log.i("FlightMode setup()", "Landing");
-                //ardrone.land();
-                //ardrone2.land();
-                Thread.sleep(5000);
+                final ARDrone ardrone_tmp1 = ardrone;
+                final ARDrone ardrone_tmp2 = ardrone2;
+
+                new Thread(new Runnable() {
+                    public void run ( ) {
+                        try
+                        {
+                            Log.i("FlightMode setup()", "Drone 1: Taking off");
+                            ardrone.land();
+                        }
+                        catch(Throwable e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+
+                new Thread(new Runnable() {
+                    public void run ( ) {
+                        try {
+                            Thread.sleep(100);
+                            Log.i("FlightMode setup()", "Drone 2: Taking off");
+                            ardrone2.land();
+                        }catch(Throwable e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+
                 //ardrone.disconnect();
                 //Log.i("FlightMode setup()", "Disconnect");
 
 
-                AsyncConnect as1 = new AsyncConnect();
+                /*AsyncConnect as1 = new AsyncConnect();
                 as1.doInBackground(ardrone);
                 ardrone.land();
                 ardrone.disconnect();
@@ -170,11 +266,7 @@ public class FlightMode extends Activity
                 as2.doInBackground(ardrone2);
                 ardrone2.land();
                 ardrone2.disconnect();
-
-
-
-
-
+                */
             }
             catch(Throwable e)
             {
@@ -187,11 +279,11 @@ public class FlightMode extends Activity
     {
         try
         {
-            Log.i("FlightMode", "START moveDrone");
+//            Log.i("FlightMode", "START moveDrone");
             //for(int i = 0; i < 50000; i++)
                 ardrone.move(one, two, three, four);
                 ardrone2.move(one, two, three, four);
-            Log.i("FlightMode", "END moveDrone");
+//            Log.i("FlightMode", "END moveDrone");
         }
         catch(Throwable e)
         {
@@ -235,7 +327,7 @@ public class FlightMode extends Activity
             @Override
             protected Void doInBackground(Void... arg0)
             {
-                Log.i("Flight Mode","Back BUTTON TEST");
+//                Log.i("Flight Mode","Back BUTTON TEST");
                 for(int i = 0; i < 10; i++)
                     moveDrone(0, 09f, 0, 0);
                 Back_Button();
@@ -308,7 +400,7 @@ public class FlightMode extends Activity
             @Override
             protected Void doInBackground(Void... arg0)
             {
-                Log.i("Flight Mode","Down BUTTON TEST");
+//                Log.i("Flight Mode","Down BUTTON TEST");
                 moveDrone(0, 0, -0.9f, 0);
                 Down_Button();
                 return null;
@@ -385,7 +477,7 @@ public class FlightMode extends Activity
             @Override
             protected Void doInBackground(Void... arg0)
             {
-                Log.i("Flight Mode","Forward BUTTON TEST");
+//                Log.i("Flight Mode","Forward BUTTON TEST");
                 for(int i = 0; i < 10; i++)
                     moveDrone(0, -0.9f, 0, 0);
                 Forward_Button();
@@ -428,7 +520,7 @@ public class FlightMode extends Activity
             @Override
             protected Void doInBackground(Void... arg0)
             {
-                Log.i("Flight Mode","Up BUTTON TEST");
+//                Log.i("Flight Mode","Up BUTTON TEST");
                 moveDrone(0, 0, 0.9f, 0);
                 Up_Button();
                 return null;
@@ -469,7 +561,7 @@ public class FlightMode extends Activity
             protected Void doInBackground(Void... arg0)
             {
                 Toast.makeText(FlightMode.this, "Left", Toast.LENGTH_LONG).show();
-                Log.i("Flight Mode","LEFT BUTTON TEST");
+//                Log.i("Flight Mode","LEFT BUTTON TEST");
                 for(int i = 0; i < 10; i++)
                     moveDrone(0, 0, 0, -0.9f);
                 Left_Button();
@@ -486,13 +578,13 @@ public class FlightMode extends Activity
                 {
                     case MotionEvent.ACTION_DOWN:
                         pressedUp = true;
-                        Log.i("FlightMode", "Action Down");
+//                        Log.i("FlightMode", "Action Down");
                         new LeftButton().doInBackground();
-                        Log.i("FlightMode", "PostTest: " + i++);
+//                        Log.i("FlightMode", "PostTest: " + i++);
                         break;
                     case MotionEvent.ACTION_UP:
                         pressedUp = false;
-                        Log.i("FlightMode", "Action Up");
+//                        Log.i("FlightMode", "Action Up");
                         break;
                 }
                 return true;
@@ -546,7 +638,7 @@ public class FlightMode extends Activity
             @Override
             protected Void doInBackground(Void... arg0)
             {
-                Log.i("Flight Mode","Right BUTTON TEST");
+//                Log.i("Flight Mode","Right BUTTON TEST");
                 for(int i = 0; i < 10; i++)
                     moveDrone(0, 0, 0, 0.9f);
                 Left_Button();

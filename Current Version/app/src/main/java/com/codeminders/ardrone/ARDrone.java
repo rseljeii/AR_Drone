@@ -292,6 +292,7 @@ public class ARDrone
             // control_socket = new Socket(drone_addr, CONTROL_PORT);
 
             cmd_sender = new CommandSender(cmd_queue, this, drone_addr, cmd_socket);
+            Log.i("ARDRONE Connect", "comd_connection for IP " + drone_addr);
             cmd_sending_thread = new AsyncTaskCommand();
             cmd_sending_thread.execute(cmd_sender);
 
@@ -303,23 +304,21 @@ public class ARDrone
 
             if(flag)
             {
-                //nav_data_reader = new NavDataReader(this, drone_addr, NAVDATA_PORT);
-                nav_data_reader = new NavDataReader(this, drone_addr, VIDEO_PORT);
+                Log.i("ARDRONE Connect", "NAV_connection");
+                nav_data_reader = new NavDataReader(this, drone_addr, NAVDATA_PORT);
+                //nav_data_reader = new NavDataReader(this, drone_addr, VIDEO_PORT);
                 nav_data_reader_thread = new AsyncTaskNav();
+                //nav_data_reader_thread.execute(this, drone_addr, NAVDATA_PORT);
                 nav_data_reader_thread.execute(nav_data_reader);
                 //flag = false;
             }
             else
             {
-                //nav_data_reader = new NavDataReader(this, drone_addr, VIDEO_PORT);
-                nav_data_reader = new NavDataReader(this, drone_addr, NAVDATA_PORT);
+                nav_data_reader = new NavDataReader(this, drone_addr, VIDEO_PORT);
                 nav_data_reader_thread = new AsyncTaskNav();
                 nav_data_reader_thread.execute(nav_data_reader);
                 flag = true;
             }
-            //video_reader = new VideoReader(this, drone_addr, VIDEO_PORT);
-            //video_reader_thread = new Thread(video_reader);
-            //video_reader_thread.start();
 
             changeState(State.CONNECTING);
 

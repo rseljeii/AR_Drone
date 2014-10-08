@@ -24,6 +24,7 @@ public class CommandSender implements Runnable
 
     public CommandSender(CommandQueue cmd_queue, ARDrone drone, InetAddress drone_addr, DatagramSocket cmd_socket)
     {
+        Log.i("CommandSender", "IP Address: " + drone_addr + "     socker: " + cmd_socket);
         this.cmd_queue = cmd_queue;
         this.drone = drone;
         this.drone_addr = drone_addr;
