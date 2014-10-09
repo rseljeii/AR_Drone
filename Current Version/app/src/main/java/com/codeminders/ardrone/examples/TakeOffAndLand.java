@@ -16,6 +16,8 @@ public class TakeOffAndLand
         ARDrone drone;
         try
         {
+
+            /*
             // Create ARDrone object,
             // connect to drone and initialize it.
             drone = new ARDrone();
@@ -44,6 +46,7 @@ public class TakeOffAndLand
             
             // Disconnect from the done
             drone.disconnect();
+            */
 
         } catch(Throwable e)
         {

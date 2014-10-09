@@ -16,35 +16,70 @@ import com.codeminders.ardrone.ARDrone;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.channels.Selector;
 
 public class FlightMode extends Activity
 {
     Boolean liftoff = false;
     Boolean pressedUp = false;
     int i = 0;
-
+    public InetAddress address1 = null;
+    public InetAddress address2 = null;
     // http://drones.johnback.us/
-    ARDrone ardrone, ardrone2;
+    public ARDrone ardrone, ardrone2;
+    static public Selector selector;
 
     void setup()
     {
         byte[] DRONE_IP_1  = { (byte) 192, (byte) 168, (byte) 1, (byte) 200 };
         byte[] DRONE_IP_2  = { (byte) 192, (byte) 168, (byte) 1, (byte) 202 };
 
-        InetAddress address1 = null;
-        InetAddress address2 = null;
+
 
         try
         {
             address1 = InetAddress.getByAddress(DRONE_IP_1);
             address2 = InetAddress.getByAddress(DRONE_IP_2);
             //ardrone = new ARDrone();
-            ardrone = new ARDrone(address1);
-            ardrone2 = new ARDrone(address2);
+            selector = Selector.open();
+            final FlightMode _handle = this;
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        _handle.ardrone = new ARDrone(_handle.address1);
+                        _handle.ardrone.connect();
 
-            AsyncConnect as1 = new AsyncConnect();
-            AsyncConnect as2 = new AsyncConnect();
+                        Log.i("FlightMode setup()", "Drone 1: Connected");
+                    }
+                    catch(Throwable e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
 
+
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        Thread.sleep(1000);
+                        _handle.ardrone2 = new ARDrone(_handle.address2);
+                        _handle.ardrone2.connect();
+
+                        Log.i("FlightMode setup()", "Drone 2: Connected");
+                    }
+                    catch(Throwable e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+
+
+
+            //AsyncConnect as1 = new AsyncConnect();
+            //AsyncConnect as2 = new AsyncConnect();
+            /*
             Log.i("FlightMode setup()", "CONNECT");
 
             final ARDrone ardrone_tmp1 = ardrone;
@@ -53,14 +88,13 @@ public class FlightMode extends Activity
             //as1.doInBackground(ardrone);
             //as2.doInBackground(ardrone2);
 
-
             new Thread(new Runnable()
             {
                 public void run ()
                 {
                     try
                     {
-                        Thread.sleep(100);
+                        //Thread.sleep(100);
                         ardrone_tmp1.connect();
                         Log.i("FlightMode setup()", "Drone 1: Connected");
                     }
@@ -77,7 +111,7 @@ public class FlightMode extends Activity
                 {
                     try
                     {
-                        Thread.sleep(100);
+                        //Thread.sleep(100);
                         ardrone_tmp2.connect();
                         Log.i("FlightMode setup()", "Drone 2: Connected");
                     }
@@ -87,19 +121,24 @@ public class FlightMode extends Activity
                     }
                 }
             }).start();
+            */
+
+
+
+
             /*
             ardrone.connect();          Log.i("FlightMode setup()", "CONNECT Drone1");
             wait(3000);
             ardrone2.connect();         Log.i("FlightMode setup()", "CONNECT Drone2");
             wait(3000);
             */
-            ardrone.clearEmergencySignal();
-            ardrone2.clearEmergencySignal();
+            //ardrone.clearEmergencySignal();
+            //ardrone2.clearEmergencySignal();
 
             //Log.i("FlightMode setup()", "Trim");
 
-            ardrone.trim();
-            ardrone2.trim();
+            //ardrone.trim();
+            //ardrone2.trim();
         }
         catch (UnknownHostException e1)
         {
@@ -172,9 +211,10 @@ public class FlightMode extends Activity
                     {
                         try
                         {
-                            Thread.sleep(100);
-                            ardrone_tmp2.takeOff();
+                            //Thread.sleep(100);
                             Thread.sleep(1000);
+                            ardrone_tmp2.takeOff();
+                            //Thread.sleep(1000);
                             Log.i("FlightMode setup()", "Drone 2: Taking off");
                         }
                         catch(Throwable e)
@@ -190,8 +230,9 @@ public class FlightMode extends Activity
                     {
                         try
                         {
+                            Thread.sleep(500);
                             ardrone_tmp1.takeOff();
-                            Thread.sleep(1000);
+
                             Log.i("FlightMode setup()", "Drone 1: Taking off");
 
                         }
@@ -201,6 +242,7 @@ public class FlightMode extends Activity
                         }
                     }
                 }).start();
+
             }
             catch(Throwable e)
             {

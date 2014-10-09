@@ -132,6 +132,7 @@ public class ARDrone
 
     private boolean                         emergencyMode     = true;
     private Object                          emergency_mutex   = new Object();
+    private int droneID;
 
     private List<DroneStatusChangeListener> status_listeners  = new LinkedList<DroneStatusChangeListener>();
     //private List<DroneVideoListener>        image_listeners   = new LinkedList<DroneVideoListener>();
@@ -307,9 +308,10 @@ public class ARDrone
                 Log.i("ARDRONE Connect", "NAV_connection");
                 nav_data_reader = new NavDataReader(this, drone_addr, NAVDATA_PORT);
                 //nav_data_reader = new NavDataReader(this, drone_addr, VIDEO_PORT);
-                nav_data_reader_thread = new AsyncTaskNav();
+                //nav_data_reader_thread = new AsyncTaskNav();
                 //nav_data_reader_thread.execute(this, drone_addr, NAVDATA_PORT);
-                nav_data_reader_thread.execute(nav_data_reader);
+                //nav_data_reader_thread.execute(nav_data_reader);
+                new Thread(nav_data_reader).start();
                 //flag = false;
             }
             else
@@ -666,6 +668,15 @@ public class ARDrone
                 }
             }
         }
+    }
+
+    //droneID
+    public void setDroneID(int droneID){
+        this.droneID = droneID;
+    }
+
+    public int getDroneID(){
+        return this.droneID;
     }
 
 }

@@ -25,6 +25,7 @@ public class ChannelThread implements Runnable {
     private DatagramChannel channel;
     private ARDrone drone;
     private Selector selector;
+    public SelectionKey key;
     private boolean done;
     private InetSocketAddress socket;
     private InetAddress drone_addr;
@@ -32,9 +33,10 @@ public class ChannelThread implements Runnable {
 
     InetSocketAddress temp = null;
 
-    public void connect(ARDrone drone, InetAddress drone_addr, int navdata_port)
+    public void connect(ARDrone drone, InetAddress drone_addr, int navdata_port, Selector selectorin)
     {
         Log.i("ChannelThread", "INSIDE CONNECT");
+        this.selector = selectorin;
         Random rand = new Random(System.currentTimeMillis());
 
         try {
@@ -46,6 +48,7 @@ public class ChannelThread implements Runnable {
             channel.socket().bind(temp);
             this.drone_addr = drone_addr;
             this.navdata_port = navdata_port;
+            this.key = channel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
         }
         catch (Exception e)
         {
@@ -60,8 +63,7 @@ public class ChannelThread implements Runnable {
             Log.i("NavDataManager", "PRE Execute " + drone_addr + " port: " + temp.getPort() + " new port: " + socket.getPort() + " nav_port: " + navdata_port);
             channel.connect(socket);
             Log.i("NavDataManager", "POST Execute " + drone_addr + " port: " + temp.getPort() + " new port: " + socket.getPort() + " nav_port: " + navdata_port);
-            selector = Selector.open();
-            channel.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+
         }
         catch (Exception e)
         {

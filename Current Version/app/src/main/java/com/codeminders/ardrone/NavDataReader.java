@@ -19,7 +19,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public class NavDataReader extends AsyncTask<NavDataReader, Void, String> implements Runnable
+public class NavDataReader implements Runnable
 {
     private static final int BUFSIZE = 4096;
 
@@ -29,15 +29,8 @@ public class NavDataReader extends AsyncTask<NavDataReader, Void, String> implem
     private boolean          done;
     private InetSocketAddress socket;
     private AsyncChannel channel_thread = new AsyncChannel();
+    private ChannelThread channelsetup;
 
-    @Override
-    protected String doInBackground(NavDataReader... params)
-    {
-        Log.i("NavDataManager", "DOING SOMETHING");
-
-        params[0].run();
-        return "Executed";
-    }
 
     public NavDataReader(ARDrone drone, InetAddress drone_addr, int navdata_port) throws IOException
     {
@@ -45,10 +38,11 @@ public class NavDataReader extends AsyncTask<NavDataReader, Void, String> implem
         BlockingQueue<Runnable> blockingQueue = new ArrayBlockingQueue<Runnable>(50);
 
         Log.i("NavDataManager", "TEST1");
-        ChannelThread channel = new ChannelThread();
+        channelsetup = new ChannelThread();
         Log.i("NavDataManager", "TEST2");
-        channel.connect(drone, drone_addr, navdata_port);
-        new Thread(channel).start();
+        selector = Selector.open();
+        channelsetup.connect(drone, drone_addr, navdata_port,selector);
+        new Thread(channelsetup).start();
         Log.i("NavDataManager", "TEST3");
 
         /*
@@ -103,31 +97,31 @@ public class NavDataReader extends AsyncTask<NavDataReader, Void, String> implem
                 }
                 Set readyKeys = selector.selectedKeys();
                 Iterator iterator = readyKeys.iterator();
-                while(iterator.hasNext())
-                {
+                while(iterator.hasNext()) {
                     SelectionKey key = (SelectionKey) iterator.next();
-                    iterator.remove();
-                    if(key.isWritable())
-                    {
-                        byte[] trigger_bytes = {0x01, 0x00, 0x00, 0x00};
-                        ByteBuffer trigger_buf = ByteBuffer.allocate(trigger_bytes.length);
-                        trigger_buf.put(trigger_bytes);
-                        trigger_buf.flip();
+                    if (key == channelsetup.key) {
 
-                        channel_thread.write(trigger_buf);
-                        //channel.write(trigger_buf);
-                        //channel.register(selector, SelectionKey.OP_READ);
-                    } else if(key.isReadable())
-                    {
-                        inbuf.clear();
-                        int len = channel.read(inbuf);
-                        byte[] packet = new byte[len];
-                        inbuf.flip();
-                        inbuf.get(packet, 0, len);
+                        iterator.remove();
+                        if (key.isWritable()) {
+                            byte[] trigger_bytes = {0x01, 0x00, 0x00, 0x00};
+                            ByteBuffer trigger_buf = ByteBuffer.allocate(trigger_bytes.length);
+                            trigger_buf.put(trigger_bytes);
+                            trigger_buf.flip();
 
-                        NavData nd = NavData.createFromData(packet);
+                            //channel_thread.write(trigger_buf);
+                            //channel.write(trigger_buf);
+                            //channel.register(selector, SelectionKey.OP_READ);
+                        } else if (key.isReadable()) {
+                            inbuf.clear();
+                            int len = channel.read(inbuf);
+                            byte[] packet = new byte[len];
+                            inbuf.flip();
+                            inbuf.get(packet, 0, len);
 
-                        drone.navDataReceived(nd);
+                            NavData nd = NavData.createFromData(packet);
+
+                            drone.navDataReceived(nd);
+                        }
                     }
                 }
             }
